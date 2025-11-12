@@ -15,7 +15,7 @@ Flavourly is a simple Flutter-based mobile application that allows users to add,
 - Simple UI: Built using Flutter’s Material Design for a smooth and modern experience.
 
 **🧩 Project Structure**
-
+```
 Flavourly/
 │
 ├── lib/
@@ -31,6 +31,7 @@ Flavourly/
 │       └── recipe_card.dart      # Custom widget for displaying recipes
 │
 └── pubspec.yaml                  # Defines dependencies and assets
+```
 
 **⚙️ Technologies Used**
 
