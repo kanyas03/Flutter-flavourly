@@ -19,8 +19,8 @@ class _AddOrEditRecipeScreenState extends State<AddOrEditRecipeScreen> {
   final _formKey = GlobalKey<FormState>();
   final _picker = ImagePicker();
 
-  File? _selectedImage;     // For Mobile/Desktop
-  Uint8List? _webImage;     // For Web
+  File? _selectedImage; // For Mobile/Desktop
+  Uint8List? _webImage; // For Web
 
   late TextEditingController _titleController;
   late TextEditingController _ingredientsController;
@@ -29,18 +29,16 @@ class _AddOrEditRecipeScreenState extends State<AddOrEditRecipeScreen> {
   @override
   void initState() {
     super.initState();
-    _titleController =
-        TextEditingController(text: widget.recipe?.title ?? '');
+    _titleController = TextEditingController(text: widget.recipe?.title ?? '');
     _ingredientsController =
         TextEditingController(text: widget.recipe?.ingredients ?? '');
     _stepsController = TextEditingController(text: widget.recipe?.steps ?? '');
 
-    // Load existing image
-    if (widget.recipe?.imagePath != null) {
+    // Load existing image if editing
+    if (widget.recipe != null) {
       if (kIsWeb) {
-        // Cannot load local file on web, skip
-        _webImage = null;
-      } else {
+        _webImage = widget.recipe!.webImage;
+      } else if (widget.recipe!.imagePath != null) {
         _selectedImage = File(widget.recipe!.imagePath!);
       }
     }
@@ -61,10 +59,10 @@ class _AddOrEditRecipeScreenState extends State<AddOrEditRecipeScreen> {
   void _saveRecipe() {
     if (_formKey.currentState!.validate()) {
       String? imagePath;
+      Uint8List? webImage;
 
       if (kIsWeb) {
-        // On web, store a dummy string or handle with base64 later
-        imagePath = null; // web image handled via _webImage
+        webImage = _webImage;
       } else {
         imagePath = _selectedImage?.path;
       }
@@ -75,6 +73,7 @@ class _AddOrEditRecipeScreenState extends State<AddOrEditRecipeScreen> {
         ingredients: _ingredientsController.text,
         steps: _stepsController.text,
         imagePath: imagePath,
+        webImage: webImage,
       );
 
       widget.onSave(recipe);
@@ -92,7 +91,7 @@ class _AddOrEditRecipeScreenState extends State<AddOrEditRecipeScreen> {
         return Image.file(_selectedImage!, height: 200, fit: BoxFit.cover);
       }
     }
-    // Default placeholder
+
     return Container(
       height: 200,
       color: Colors.grey[300],
@@ -118,27 +117,28 @@ class _AddOrEditRecipeScreenState extends State<AddOrEditRecipeScreen> {
                 onTap: _pickImage,
                 child: _imagePreview(),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(labelText: 'Recipe Title'),
+                decoration: const InputDecoration(labelText: 'Recipe Title'),
                 validator: (v) => v!.isEmpty ? 'Please enter title' : null,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _ingredientsController,
-                decoration: InputDecoration(labelText: 'Ingredients'),
+                decoration: const InputDecoration(labelText: 'Ingredients'),
                 maxLines: 3,
-                validator: (v) => v!.isEmpty ? 'Please enter ingredients' : null,
+                validator: (v) =>
+                    v!.isEmpty ? 'Please enter ingredients' : null,
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _stepsController,
-                decoration: InputDecoration(labelText: 'Steps'),
+                decoration: const InputDecoration(labelText: 'Steps'),
                 maxLines: 4,
                 validator: (v) => v!.isEmpty ? 'Please enter steps' : null,
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _saveRecipe,
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../models/recipe_model.dart';
 import 'addrecipe.dart';
@@ -33,12 +34,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Flavourly '),
+        title: const Text('Flavourly'),
         centerTitle: true,
         backgroundColor: Colors.orange,
       ),
       body: recipes.isEmpty
-          ? Center(
+          ? const Center(
               child: Text(
                 'No recipes yet!\nTap + to add your first one.',
                 textAlign: TextAlign.center,
@@ -49,26 +50,37 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: recipes.length,
               itemBuilder: (context, index) {
                 final recipe = recipes[index];
+                Widget leadingImage;
+
+                if (!kIsWeb && recipe.imagePath != null) {
+                  leadingImage = Image.file(File(recipe.imagePath!),
+                      width: 60, height: 60, fit: BoxFit.cover);
+                } else if (kIsWeb && recipe.webImage != null) {
+                  leadingImage = Image.memory(recipe.webImage!,
+                      width: 60, height: 60, fit: BoxFit.cover);
+                } else {
+                  leadingImage = const Icon(Icons.fastfood, size: 40);
+                }
+
                 return Card(
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   elevation: 4,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   child: ListTile(
-                    leading: recipe.imagePath != null
-                        ? Image.file(File(recipe.imagePath!),
-                            width: 60, height: 60, fit: BoxFit.cover)
-                        : Icon(Icons.fastfood, size: 40),
+                    leading: leadingImage,
                     title: Text(recipe.title),
-                    subtitle: Text(recipe.ingredients.length > 50
-                        ? '${recipe.ingredients.substring(0, 50)}...'
-                        : recipe.ingredients),
+                    subtitle: Text(
+                      recipe.ingredients.length > 50
+                          ? '${recipe.ingredients.substring(0, 50)}...'
+                          : recipe.ingredients,
+                    ),
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) =>
-                              RecipeDetailScreen(recipe: recipe),
+                          builder: (_) => RecipeDetailScreen(recipe: recipe),
                         ),
                       );
                     },
@@ -76,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
-                          icon: Icon(Icons.edit, color: Colors.blue),
+                          icon: const Icon(Icons.edit, color: Colors.blue),
                           onPressed: () {
                             Navigator.push(
                               context,
@@ -90,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           },
                         ),
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
+                          icon: const Icon(Icons.delete, color: Colors.red),
                           onPressed: () => deleteRecipe(index),
                         ),
                       ],
@@ -109,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
       ),
     );
   }
